@@ -26,7 +26,7 @@ import subprocess
 from os.path import join, exists, basename
 
 from lxml import etree
-
+import unicodedata
 log = logging.getLogger()  # pylint: disable=invalid-name
 logging.basicConfig()
 log.setLevel(logging.DEBUG)
@@ -503,7 +503,9 @@ class XBundle(object):
 
         for key, val in replacements.items():
             for char in key:
-                display_name = display_name.replace(str.encode(char), str.encode(val))
+                char_bytes = unicodedata.normalize('NFKD', char).encode('ascii','ignore')
+                val_bytes = unicodedata.normalize('NFKD', val).encode('ascii','ignore')
+                display_name = display_name.replace(char_bytes, val_bytes)
         if name and display_name in self.urlnames and parent:
             display_name += '_' + parent
         while display_name in self.urlnames:
